@@ -6,10 +6,9 @@
 void receiveEvent(int howMany);
 void requestEvent();
 void monitorHostCmd();
-String str;
 long destination;
 AccelStepper myStepper(AccelStepper::DRIVER, Pls, Dir);
-
+String str = "";
 void setup() {
   pinMode(En, OUTPUT);
   pinMode(Dir, OUTPUT);
@@ -28,7 +27,6 @@ void loop() {
 
 void receiveEvent(int howMany) 
 {
-  String str = "";
   while (Wire.available()) 
   {
     char c = Wire.read();
