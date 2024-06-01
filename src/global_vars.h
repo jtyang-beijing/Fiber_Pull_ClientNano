@@ -7,4 +7,5 @@ extern int MAX_SPEED;
 extern int ACCELORATION;
 
 extern char HOST_CMD_STOP;
+extern char RESET_MOTOR_POSITION;
 #endif

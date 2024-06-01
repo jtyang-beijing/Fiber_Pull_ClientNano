@@ -18,6 +18,11 @@ void receiveEvent(int i)
       myStepper.moveTo(destination);
       break;
     }
+    if(x == RESET_MOTOR_POSITION) 
+    {
+      myStepper.setCurrentPosition(0);
+      break;
+    }
     str += x;
   }
   if(str != "")
