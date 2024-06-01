@@ -4,7 +4,6 @@
 #include <Wire.h>
 #include <AccelStepper.h>
 
-long destination;
 AccelStepper myStepper(AccelStepper::DRIVER, Pls, Dir);
 
 void receiveEvent(int i) 
@@ -14,8 +13,7 @@ void receiveEvent(int i)
     char x = Wire.read();
     if(x == HOST_CMD_STOP) 
     {
-      destination = myStepper.currentPosition();
-      myStepper.moveTo(destination);
+      myStepper.stop();
       break;
     }
     if(x == RESET_MOTOR_POSITION) 
@@ -27,8 +25,10 @@ void receiveEvent(int i)
   }
   if(str != "")
   {
-    destination = strtol(str.c_str(),NULL,10);
-    myStepper.moveTo(destination);
+    while(digitalRead(En))
+    digitalWrite(En, LOW);
+    DESTINATION = strtol(str.c_str(),NULL,10);
+    myStepper.moveTo(DESTINATION);
   }
 }
 
@@ -40,16 +40,19 @@ void setup() {
   pinMode(En, OUTPUT);
   pinMode(Dir, OUTPUT);
   pinMode(Pls, OUTPUT);
+  //digitalWrite(En, HIGH);// disable motor. AccelStepper.run will handle it.
   Wire.begin(I2C_ADD);
   Wire.onRequest(requestEvent); 
   Wire.onReceive(receiveEvent);
   Serial.begin(115200);
-  //Serial.println("I2C Slave Demonstration");
   myStepper.setMaxSpeed(MAX_SPEED);
   myStepper.setAcceleration(ACCELORATION);
-  destination=0;
 }
 
 void loop() {
-myStepper.run();
+  myStepper.run();
+  // if(!myStepper.isRunning())
+  // {
+  //   digitalWrite(En, HIGH);
+  // }
 }
