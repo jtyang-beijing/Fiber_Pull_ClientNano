@@ -8,8 +8,12 @@ int SPEED = MAX_SPEED;
 int ACCELORATION = MAX_ACCELORATION;
 long DESTINATION = 0;
 
-char HOST_CMD_STOP = 'e';
-char RESET_MOTOR_POSITION = 'o';
-char SET_SPEED = 's';
-char SET_ACC = 'a';
+char const HOST_CMD_STOP = 'e';
+char const RESET_MOTOR_POSITION = 'o';
+char const SET_SPEED = 's';
+char const SET_ACC = 'a';
+char const RUN_MOTOR = 'm';
+
+const int bufferSize = 20;
+char inputBuffer[bufferSize];
 

@@ -8,8 +8,12 @@ extern int SPEED;
 extern int MAX_ACCELORATION;
 extern int ACCELORATION;
 extern long DESTINATION;
-extern char HOST_CMD_STOP;
-extern char RESET_MOTOR_POSITION;
-extern char SET_SPEED;
-extern char SET_ACC;
+extern const char HOST_CMD_STOP;
+extern const char RESET_MOTOR_POSITION;
+extern const char SET_SPEED;
+extern const char SET_ACC;
+extern const char RUN_MOTOR;
+
+extern const int bufferSize;
+extern char inputBuffer[];
 #endif

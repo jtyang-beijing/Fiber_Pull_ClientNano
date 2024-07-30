@@ -5,6 +5,17 @@
 #include <AccelStepper.h>
 
 AccelStepper myStepper(AccelStepper::DRIVER, Pls, Dir);
+void run_motor()
+{
+  char* token;
+  while(digitalRead(En))
+  digitalWrite(En, LOW);
+  token = strtok(inputBuffer, "m");
+  //DESTINATION = strtol(str.c_str(),NULL,10);
+  DESTINATION = atol(token);
+  //while(!digitalRead(FarLimit))
+  myStepper.moveTo(DESTINATION);
+}
 void set_motor_speed()
 {
   String speed = "";
@@ -34,41 +45,36 @@ void set_motor_acceloration()
 }
 
 void receiveEvent(int i) 
-{
-  String str = "";
-  while (0 < Wire.available()) {
+{ 
+  int index=0;
+  while (0 < Wire.available() && index<bufferSize-1) 
+  {
     char x = Wire.read();
+    inputBuffer[index++]=x;
+    if(x=='\0')break;
+  }
+  inputBuffer[index]='\0';
+  Serial.println("inputBuffer=" + String(inputBuffer));
+  char x = inputBuffer[0];
     if(x == HOST_CMD_STOP) 
     {
       myStepper.stop();
-      break;
     }
     else if(x == RESET_MOTOR_POSITION) 
     {
       myStepper.setCurrentPosition(0);
-      break;
     }
     else if(x == SET_SPEED)
     {
-      delay(100);
       set_motor_speed();
-      break;
     }
     else if(x== SET_ACC)
     {
-      delay(100);
       set_motor_acceloration();
-      break;
     }
-    str += x;
-  }
-  if(str != "")
+  else if(x == RUN_MOTOR)
   {
-    while(digitalRead(En))
-    digitalWrite(En, LOW);
-    DESTINATION = strtol(str.c_str(),NULL,10);
-    //while(!digitalRead(FarLimit))
-    myStepper.moveTo(DESTINATION);
+    run_motor();
   }
 }
 
@@ -84,7 +90,7 @@ void setup() {
   Wire.begin(I2C_ADD);
   Wire.onRequest(requestEvent); 
   Wire.onReceive(receiveEvent);
-  //Serial.begin(115200);
+  Serial.begin(115200);
   myStepper.setMaxSpeed(MAX_SPEED);
   myStepper.setAcceleration(MAX_ACCELORATION);
 }
