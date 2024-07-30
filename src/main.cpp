@@ -4,6 +4,12 @@
 #include <Wire.h>
 #include <AccelStepper.h>
 
+const char HOST_CMD_STOP = 'e';
+const char RESET_MOTOR_POSITION = 'o';
+const char SET_SPEED = 's';
+const char SET_ACC = 'a';
+const char RUN_MOTOR = 'm';
+
 AccelStepper myStepper(AccelStepper::DRIVER, Pls, Dir);
 void run_motor()
 {
@@ -18,29 +24,20 @@ void run_motor()
 }
 void set_motor_speed()
 {
-  String speed = "";
-  char x;
-  while (0< Wire.available())
-  {
-    x = Wire.read();
-    if (x == '\n') break;
-    speed +=x;
-  }
-  SPEED = speed.toFloat() / 100 * MAX_SPEED;
+  char* token;
+  token = strtok(inputBuffer,"s");
+  float speed = atof(token);
+  SPEED = speed / 100 * MAX_SPEED;
   myStepper.setMaxSpeed(SPEED);
+  //Serial.println("MaxSpeed set to:" + String(SPEED));
 }
 
 void set_motor_acceloration()
 {
-  String acc = "";
-  char x;
-  while (0< Wire.available())
-  {
-    x = Wire.read();
-    if (x == '\n') break;
-    acc +=x;
-  }
-  ACCELORATION = acc.toFloat() / 100 * MAX_ACCELORATION;
+  char* token;
+  token = strtok(inputBuffer, "a");
+  float acc = atof(token);
+  ACCELORATION = acc / 100 * MAX_ACCELORATION;
   myStepper.setAcceleration(ACCELORATION);
 }
 
@@ -54,27 +51,16 @@ void receiveEvent(int i)
     if(x=='\0')break;
   }
   inputBuffer[index]='\0';
-  Serial.println("inputBuffer=" + String(inputBuffer));
-  char x = inputBuffer[0];
-    if(x == HOST_CMD_STOP) 
-    {
-      myStepper.stop();
-    }
-    else if(x == RESET_MOTOR_POSITION) 
-    {
-      myStepper.setCurrentPosition(0);
-    }
-    else if(x == SET_SPEED)
-    {
-      set_motor_speed();
-    }
-    else if(x== SET_ACC)
-    {
-      set_motor_acceloration();
-    }
-  else if(x == RUN_MOTOR)
+  char cmd = inputBuffer[0];
+  //Serial.println(String(inputBuffer));
+  switch (cmd)
   {
-    run_motor();
+    case HOST_CMD_STOP:myStepper.stop();break;
+    case RESET_MOTOR_POSITION:myStepper.setCurrentPosition(0);break;
+    case SET_SPEED:set_motor_speed();break;
+    case SET_ACC:set_motor_acceloration();break;
+    case RUN_MOTOR:run_motor();break;
+    default:break;
   }
 }
 
@@ -90,7 +76,7 @@ void setup() {
   Wire.begin(I2C_ADD);
   Wire.onRequest(requestEvent); 
   Wire.onReceive(receiveEvent);
-  Serial.begin(115200);
+  //Serial.begin(115200);
   myStepper.setMaxSpeed(MAX_SPEED);
   myStepper.setAcceleration(MAX_ACCELORATION);
 }
